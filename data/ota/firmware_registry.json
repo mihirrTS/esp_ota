@@ -1,0 +1,32 @@
+{
+  "firmware_versions": {
+    "ESP32_OTA_Base_2.0": {
+      "version": "2.0",
+      "device_type": "ESP32_OTA_Base",
+      "filename": "ESP32_OTA_Base_2.0_20251001_222859.bin",
+      "filepath": "data/ota\\firmware\\ESP32_OTA_Base_2.0_20251001_222859.bin",
+      "description": "Test upload",
+      "upload_date": "2025-10-01T22:28:59.862038",
+      "file_size": 1133072,
+      "file_hash": "ae672f17612e97121cebab7db9685385a043b70576615906044ffd698f97adb5",
+      "download_count": 0,
+      "is_active": true
+    }
+  },
+  "device_assignments": {
+    "ESP32_PersonalCMS": {
+      "latest": "2.0"
+    },
+    "ESP32_LED_Blink": {
+      "latest": "2.0"
+    },
+    "ESP32_OTA_BASE_001": "compiled_ESP32_DevKit_V1_OTA_Base",
+    "ESP32_OTA_LED_001": "compiled_ESP32_DevKit_V1_LED_Blink",
+    "ESP32_DevKit_V1_Device1": "compiled_ESP32_DevKit_V1_OTA_Base",
+    "ESP32_DevKit_V1_Device2": "compiled_ESP32_DevKit_V1_LED_Blink",
+    "ESP32_OTA_Base": {
+      "latest": "2.0"
+    }
+  },
+  "auto_update_enabled": true
+}

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Management System - Admin Panel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .category-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            overflow: hidden;
+        }
+        
+        .category-header {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .category-stats {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .subcategory-section {
+            padding: 20px;
+        }
+        
+        .subcategory-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 5px;
+        }
+        
+        .subcategory-name {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .content-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .content-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .content-item:last-child {
+            border-bottom: none;
+        }
+        
+        .content-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .content-text {
+            flex: 1;
+            margin-right: 15px;
+        }
+        
+        .content-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .form-inline {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .content-preview {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .add-content-section {
+            border-top: 2px solid #eee;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav-links">
+            <a href="/">🏠 Dashboard</a>
+            <a href="/content-management">📝 Content Management</a>
+            <a href="/content-admin" class="active">⚙️ Content Admin</a>
+            <a href="/upload">📷 Upload Images</a>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>⚙️ Content Management System</h1>
+            <p>Manage categories, subcategories, and all content across the platform</p>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_categories }}</div>
+                <div>Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_subcategories }}</div>
+                <div>Subcategories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ total_content_items }}</div>
+                <div>Content Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ active_devices }}</div>
+                <div>Active Devices</div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('manage-content')">📝 Manage Content</button>
+            <button class="tab" onclick="showTab('add-category')">📁 Add Categories</button>
+            <button class="tab" onclick="showTab('content-stats')">📊 Statistics</button>
+            <button class="tab" onclick="showTab('bulk-actions')">⚡ Bulk Actions</button>
+        </div>
+        
+        <!-- Tab: Manage Content -->
+        <div id="manage-content" class="tab-content active">
+            <div class="content-section">
+                <h2>📝 Content Management</h2>
+                <p>Edit, add, and manage content for each category and subcategory</p>
+                
+                <!-- Search -->
+                <input type="text" class="search-box" placeholder="🔍 Search content..." onkeyup="filterContent(this.value)">
+                
+                <!-- Categories Grid -->
+                <div class="category-grid">
+                    {% for main_category, subcategories in content_structure.items() %}
+                    <div class="category-card" data-category="{{ main_category }}">
+                        <div class="category-header">
+                            <h3 class="category-title">{{ main_category.title() }} {{ category_emojis.get(main_category, '📋') }}</h3>
+                            <span class="category-stats">{{ subcategories|length }} subcategories</span>
+                        </div>
+                        
+                        {% for subcategory, items in subcategories.items() %}
+                        <div class="subcategory-section">
+                            <div class="subcategory-header">
+                                <span class="subcategory-name">{{ subcategory.replace('_', ' ').title() }}</span>
+                                <span class="category-stats">{{ items|length }} items</span>
+                                <button class="btn btn-sm btn-success" onclick="showAddContentModal('{{ main_category }}', '{{ subcategory }}')">➕ Add</button>
+                            </div>
+                            
+                            <div class="content-list">
+                                {% for item in items %}
+                                {% set item_id = (content_id_map.get(main_category, {}).get(subcategory, [])[loop.index0]) if content_id_map is defined else None %}
+                                <div class="content-item" data-category="{{ main_category }}" data-subcategory="{{ subcategory }}" data-content-index="{{ loop.index0 }}" data-content="{{ loop.index }}" data-item-id="{{ item_id }}" data-content-json='{{ item|tojson }}'>
+                                    <div class="content-text">
+                                        <div class="content-preview">
+                                            {% if item is mapping and 'question' in item %}
+                                                <strong>Q:</strong> {{ item.question }}
+                                            {% elif item is mapping and 'title' in item %}
+                                                <strong>{{ item.title }}</strong>
+                                            {% else %}
+                                                {{ item }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="content-actions">
+                                        <button class="btn btn-sm btn-warning" onclick="editContent(this)">✏️</button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteContent(this)">🗑️</button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Add new content form -->
+                            <div class="add-content-section">
+                                <h5>Add New {{ subcategory.replace('_', ' ').title() }}</h5>
+                                <form onsubmit="addContent(event, '{{ main_category }}', '{{ subcategory }}')">
+                                    {% if 'joke' in subcategory %}
+                                        <div class="form-group">
+                                            <textarea name="content" placeholder="Enter new joke..." required></textarea>
+                                        </div>
+                                    {% elif 'riddle' in subcategory %}
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <label>Question:</label>
+                                                <input type="text" name="question" placeholder="Enter riddle question..." required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Answer:</label>
+                                                <input type="text" name="answer" placeholder="Enter answer..." required>
+                                            </div>
+                                        </div>
+                                    {% elif 'news' in subcategory %}
+                                        <div class="form-group">
+                                            <label>Title:</label>
+                                            <input type="text" name="title" placeholder="News headline..." required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Summary:</label>
+                                            <textarea name="summary" placeholder="News summary..." required></textarea>
+                                        </div>
+                                    {% else %}
+                                        <div class="form-group">
+                                            <textarea name="content" placeholder="Enter content..." required></textarea>
+                                        </div>
+                                    {% endif %}
+                                    <button type="submit" class="btn btn-success">➕ Add Content</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Add Categories -->
+        <div id="add-category" class="tab-content">
+            <div class="content-section">
+                <h2>📁 Category & Subcategory Management</h2>
+                
+                <!-- Add New Category -->
+                <div style="background: #e8f4fd; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                    <h3>🆕 Add New Category</h3>
+                    <form onsubmit="addCategory(event)">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label>Category Name:</label>
+                                <input type="text" name="category_name" placeholder="e.g., facts, quotes, tips" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Emoji:</label>
+                                <input type="text" name="category_emoji" placeholder="📚" maxlength="2">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea name="category_description" placeholder="Brief description of this category..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">🆕 Create Category</button>
+                    </form>
+                </div>
+                
+                <!-- Add New Subcategory -->
+                <div style="background: #f0f8ff; padding: 20px; border-radius: 10px;">
+                    <h3>📂 Add New Subcategory</h3>
+                    <form onsubmit="addSubcategory(event)">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label>Parent Category:</label>
+                                <select name="parent_category" required>
+                                    <option value="">Select category...</option>
+                                    {% for category in content_structure.keys() %}
+                                    <option value="{{ category }}">{{ category.title() }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Subcategory Name:</label>
+                                <input type="text" name="subcategory_name" placeholder="e.g., science_facts" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Content Type:</label>
+                            <select name="content_type">
+                                <option value="text">Simple Text</option>
+                                <option value="riddle">Question & Answer</option>
+                                <option value="news">Title & Summary</option>
+                                <option value="custom">Custom Structure</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">📂 Create Subcategory</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Statistics -->
+        <div id="content-stats" class="tab-content">
+            <div class="content-section">
+                <h2>📊 Content Statistics & Analytics</h2>
+                
+                <div class="category-grid">
+                    {% for category, subcategories in content_structure.items() %}
+                    <div class="stat-card" style="text-align: left;">
+                        <h3>{{ category.title() }} {{ category_emojis.get(category, '📋') }}</h3>
+                        <p><strong>Subcategories:</strong> {{ subcategories|length }}</p>
+                        <p><strong>Total Items:</strong> {{ subcategories.values()|map('length')|sum }}</p>
+                        <p><strong>Most Popular:</strong> {{ subcategories.keys()|list|first if subcategories else 'None' }}</p>
+                        <p><strong>Usage:</strong> Available to {{ devices_using_category.get(category, 0) }} devices</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab: Bulk Actions -->
+        <div id="bulk-actions" class="tab-content">
+            <div class="content-section">
+                <h2>⚡ Bulk Content Actions</h2>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <!-- Import Content -->
+                    <div style="background: #e8f5e8; padding: 20px; border-radius: 10px;">
+                        <h3>📥 Import Content</h3>
+                        <p>Upload JSON file with bulk content</p>
+                        <form onsubmit="importContent(event)" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <input type="file" name="content_file" accept=".json" required>
+                            </div>
+                            <button type="submit" class="btn btn-success">📥 Import</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Export Content -->
+                    <div style="background: #fff3e0; padding: 20px; border-radius: 10px;">
+                        <h3>📤 Export Content</h3>
+                        <p>Download all content as JSON</p>
+                        <a href="/content-admin/export" class="btn btn-warning">📤 Export All Content</a>
+                    </div>
+                    
+                    <!-- Reset Categories -->
+                    <div style="background: #ffebee; padding: 20px; border-radius: 10px;">
+                        <h3>🔄 Reset to Defaults</h3>
+                        <p>Restore original content categories</p>
+                        <button class="btn btn-danger" onclick="resetToDefaults()">🔄 Reset All</button>
+                    </div>
+                    
+                    <!-- Backup Content -->
+                    <div style="background: #f3e5f5; padding: 20px; border-radius: 10px;">
+                        <h3>💾 Create Backup</h3>
+                        <p>Save current content state</p>
+                        <button class="btn" onclick="createBackup()">💾 Create Backup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Content Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>✏️ Edit Content</h2>
+            <form id="editForm" onsubmit="updateContent(event)">
+                <div id="editFields"></div>
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-success">💾 Save Changes</button>
+                    <button type="button" class="btn" onclick="closeModal()">❌ Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+    let currentEditData = {};
+        
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        function filterContent(searchTerm) {
+            const items = document.querySelectorAll('.content-item');
+            const term = searchTerm.toLowerCase();
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(term)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        async function addContent(event, category, subcategory) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const data = {
+                category: category,
+                subcategory: subcategory,
+                content: {}
+            };
+            
+            // Build content object based on form fields
+            for (let [key, value] of formData.entries()) {
+                data.content[key] = value;
+            }
+            
+            try {
+                const response = await fetch('/content-admin/add-content', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('Content added successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+        
+        function editContent(el) {
+            let item_id = null;
+            let content = null;
+            let category = null;
+            let subcategory = null;
+            let index = null;
+            try {
+                const container = el.closest('.content-item');
+                const idAttr = container ? container.getAttribute('data-item-id') : null;
+                const contentAttr = container ? container.getAttribute('data-content-json') : null;
+                category = container ? container.getAttribute('data-category') : null;
+                subcategory = container ? container.getAttribute('data-subcategory') : null;
+                index = container ? parseInt(container.getAttribute('data-content-index') || '0', 10) : 0;
+                if (idAttr && idAttr !== 'None' && idAttr !== 'null' && idAttr !== '') {
+                    item_id = parseInt(idAttr, 10);
+                }
+                if (contentAttr) {
+                    content = JSON.parse(contentAttr);
+                }
+            } catch (e) {}
+            if (!item_id) {
+                showAlert('This item is part of default content and cannot be edited directly. Add it as custom first.', 'error');
+                return;
+            }
+            currentEditData = {category, subcategory, index, content, item_id};
+            
+            const modal = document.getElementById('editModal');
+            const fieldsDiv = document.getElementById('editFields');
+            
+            fieldsDiv.innerHTML = '';
+            
+            if (typeof content === 'object' && content.question) {
+                // Riddle format
+                fieldsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label>Question:</label>
+                        <input type="text" name="question" value="${content.question}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Answer:</label>
+                        <input type="text" name="answer" value="${content.answer}" required>
+                    </div>
+                `;
+            } else if (typeof content === 'object' && content.title) {
+                // News format
+                fieldsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label>Title:</label>
+                        <input type="text" name="title" value="${content.title}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Summary:</label>
+                        <textarea name="summary" required>${content.summary || ''}</textarea>
+                    </div>
+                `;
+            } else {
+                // Simple text
+                fieldsDiv.innerHTML = `
+                    <div class="form-group">
+                        <label>Content:</label>
+                        <textarea name="content" required>${content}</textarea>
+                    </div>
+                `;
+            }
+            
+            modal.style.display = 'block';
+        }
+        
+        async function updateContent(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const data = {
+                category: currentEditData.category,
+                subcategory: currentEditData.subcategory,
+                item_id: currentEditData.item_id,
+                content: {}
+            };
+            
+            for (let [key, value] of formData.entries()) {
+                data.content[key] = value;
+            }
+            
+            try {
+                const response = await fetch('/content-admin/update-content', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('Content updated successfully!', 'success');
+                    closeModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function deleteContent(el) {
+            if (!confirm('Are you sure you want to delete this content?')) return;
+            let item_id = null;
+            try {
+                const container = el.closest('.content-item');
+                const attr = container ? container.getAttribute('data-item-id') : null;
+                if (attr && attr !== 'None' && attr !== 'null' && attr !== '') {
+                    item_id = parseInt(attr, 10);
+                }
+            } catch (e) {}
+            if (!item_id) {
+                showAlert('This item is part of default content and cannot be deleted. Delete is only available for custom items.', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/content-admin/delete-content', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        category: el.closest('.content-item')?.getAttribute('data-category'),
+                        subcategory: el.closest('.content-item')?.getAttribute('data-subcategory'),
+                        item_id
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('Content deleted successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function addCategory(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const data = {
+                name: formData.get('category_name'),
+                emoji: formData.get('category_emoji'),
+                description: formData.get('category_description')
+            };
+            
+            try {
+                const response = await fetch('/content-admin/add-category', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('Category created successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function addSubcategory(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const data = {
+                parent: formData.get('parent_category'),
+                name: formData.get('subcategory_name'),
+                type: formData.get('content_type')
+            };
+            
+            try {
+                const response = await fetch('/content-admin/add-subcategory', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('Subcategory created successfully!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert('Error: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            alertDiv.style.position = 'fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '9999';
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+        
+        // Close modal with X button
+        document.querySelector('.close').onclick = closeModal;
+    </script>
+</body>
+</html>

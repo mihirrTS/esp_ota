@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Content Sources{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>
+                        <i class="fas fa-source-branch me-2"></i>
+                        Content Sources Configuration
+                    </h4>
+                    <div>
+                        <a href="{{ url_for('content_apis') }}" class="btn btn-info">
+                            <i class="fas fa-plug me-2"></i>Manage APIs
+                        </a>
+                        <a href="{{ url_for('default_content') }}" class="btn btn-warning">
+                            <i class="fas fa-edit me-2"></i>Edit Default Content
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Choose between preset content or API-driven content for each category and subcategory.
+                    </p>
+                    
+                    <div class="row">
+                        <!-- Jokes Section -->
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h5><i class="fas fa-laugh me-2"></i>😄 Jokes</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% for subcategory in ['dad_jokes', 'programming_jokes', 'clean_jokes'] %}
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ subcategory.replace('_', ' ').title() }}</label>
+                                        <form method="POST" action="{{ url_for('toggle_content_source') }}" class="d-inline">
+                                            <input type="hidden" name="category" value="jokes">
+                                            <input type="hidden" name="subcategory" value="{{ subcategory }}">
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="source_type" value="preset" id="jokes_{{ subcategory }}_preset"
+                                                       {% if source_config.get('jokes', {}).get(subcategory, 'preset') == 'preset' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-success" for="jokes_{{ subcategory }}_preset">Preset</label>
+                                                
+                                                <input type="radio" class="btn-check" name="source_type" value="api" id="jokes_{{ subcategory }}_api"
+                                                       {% if source_config.get('jokes', {}).get(subcategory, 'preset') == 'api' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-primary" for="jokes_{{ subcategory }}_api">API</label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Riddles Section -->
+                        <div class="col-md-4">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h5><i class="fas fa-puzzle-piece me-2"></i>🧩 Riddles</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% for subcategory in ['easy_riddles', 'math_riddles', 'logic_riddles'] %}
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ subcategory.replace('_', ' ').title() }}</label>
+                                        <form method="POST" action="{{ url_for('toggle_content_source') }}" class="d-inline">
+                                            <input type="hidden" name="category" value="riddles">
+                                            <input type="hidden" name="subcategory" value="{{ subcategory }}">
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="source_type" value="preset" id="riddles_{{ subcategory }}_preset"
+                                                       {% if source_config.get('riddles', {}).get(subcategory, 'preset') == 'preset' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-success" for="riddles_{{ subcategory }}_preset">Preset</label>
+                                                
+                                                <input type="radio" class="btn-check" name="source_type" value="api" id="riddles_{{ subcategory }}_api"
+                                                       {% if source_config.get('riddles', {}).get(subcategory, 'preset') == 'api' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-primary" for="riddles_{{ subcategory }}_api">API</label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- News Section -->
+                        <div class="col-md-4">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h5><i class="fas fa-newspaper me-2"></i>📰 News</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% for subcategory in ['tech_news', 'sports_news', 'world_news'] %}
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ subcategory.replace('_', ' ').title() }}</label>
+                                        <form method="POST" action="{{ url_for('toggle_content_source') }}" class="d-inline">
+                                            <input type="hidden" name="category" value="news">
+                                            <input type="hidden" name="subcategory" value="{{ subcategory }}">
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="source_type" value="preset" id="news_{{ subcategory }}_preset"
+                                                       {% if source_config.get('news', {}).get(subcategory, 'preset') == 'preset' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-success" for="news_{{ subcategory }}_preset">Preset</label>
+                                                
+                                                <input type="radio" class="btn-check" name="source_type" value="api" id="news_{{ subcategory }}_api"
+                                                       {% if source_config.get('news', {}).get(subcategory, 'preset') == 'api' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-primary" for="news_{{ subcategory }}_api">API</label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> 
+                            <ul class="mb-0">
+                                <li><strong>Preset:</strong> Uses built-in content stored in the server</li>
+                                <li><strong>API:</strong> Fetches content from external APIs (configure in Manage APIs)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

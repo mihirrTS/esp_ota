@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Preview - {{ device.device_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('device_detail', device_id=device.device_id) }}">{{ device.device_name }}</a></li>
+                    <li class="breadcrumb-item active">Dashboard Preview</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-tv"></i> Dashboard Preview for {{ device.device_name }}</h4>
+                    <small class="text-muted">Device ID: {{ device.device_id }} | Type: {{ device.device_type }}</small>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        This is a preview of how the content will appear on the device's e-paper display.
+                    </div>
+                    
+                    <div class="dashboard-preview border p-4 bg-light" style="font-family: monospace; max-width: 800px; margin: 0 auto;">
+                        <div class="text-center mb-3">
+                            <h5>PersonalCMS - {{ device.nickname or device.device_name }}</h5>
+                            {% if device.nickname %}
+                            <small>Device: {{ device.device_name }}</small><br>
+                            {% endif %}
+                            <small>Occupation: {{ device.occupation }}</small><br>
+                            <small>Updated: {{ moment().strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <hr>
+                        
+                        {% if content %}
+                            {% for category, subcategories in content.items() %}
+                            <div class="mb-3">
+                                <strong>{{ category.upper() }}:</strong>
+                                {% for subcategory, items in subcategories.items() %}
+                                <div class="ml-2">
+                                    <strong>• {{ subcategory.replace('_', ' ').title() }}:</strong>
+                                    {% if items and items|length > 0 %}
+                                        {% set first_item = items[0] %}
+                                        <div class="ml-3">
+                                            {% if first_item is mapping %}
+                                                {% if first_item.get('question') %}
+                                                    {{ first_item.question[:60] }}{% if first_item.question|length > 60 %}...{% endif %}
+                                                {% elif first_item.get('title') %}
+                                                    {{ first_item.title[:60] }}{% if first_item.title|length > 60 %}...{% endif %}
+                                                {% else %}
+                                                    {{ (first_item|string)[:60] }}{% if (first_item|string)|length > 60 %}...{% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ (first_item|string)[:60] }}{% if (first_item|string)|length > 60 %}...{% endif %}
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted">
+                                <p>No content configured</p>
+                                <p>Fallback screen will be displayed</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('device_detail', device_id=device.device_id) }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Device
+                    </a>
+                    <a href="{{ url_for('view_device_content', device_id=device.device_id) }}" class="btn btn-info">
+                        <i class="fas fa-list"></i> View Full Content
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

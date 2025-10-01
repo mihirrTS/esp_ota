@@ -1,0 +1,69 @@
+{
+  "firmware_name": "ESP32_DevKit_V1_OTA_Base_v2.0.bin",
+  "version": "2.0",
+  "device_type": "ESP32_OTA_Base",
+  "description": "COMPILED ESP32 firmware with proper HTTPUpdate API fixes. Includes PersonalCMS capabilities and automatic cross-firmware OTA updates. Compiled with Arduino CLI and ESP32 Core 3.x.",
+  "features": [
+    "WiFi captive portal setup",
+    "OTA updates every 2 minutes",
+    "Device registration with server",
+    "Heartbeat monitoring",
+    "LED status indicators",
+    "Web configuration interface",
+    "NVS credential storage",
+    "HTTPUpdate API compatibility fixes (ESP32 Core 3.x)",
+    "Enhanced error handling",
+    "PersonalCMS integration",
+    "Automatic cross-firmware updates",
+    "Real compiled binary (1.13MB)"
+  ],
+  "compilation_date": "2025-10-01",
+  "size_bytes": 1133072,
+  "esp32_core_version": "3.3.1",
+  "arduino_version": "2.3.2",
+  "compiled_with": "Arduino CLI",
+  "fixes_included": [
+    "HTTPUpdate API compatibility with ESP32 Core 3.x",
+    "WiFiClient and HTTPClient proper initialization",
+    "Device registration with occupation field",
+    "Heartbeat with occupation data",
+    "Improved WiFi connection handling",
+    "Enhanced OTA error recovery",
+    "Cross-firmware update support",
+    "Proper ESP32 binary headers"
+  ],
+  "hardware_requirements": {
+    "board": "ESP32 DevKit V1",
+    "memory": "4MB Flash minimum",
+    "led": "Built-in LED (GPIO 2)"
+  },
+  "configuration": {
+    "captive_portal_ssid": "ESP32-OTA-Setup",
+    "captive_portal_password": "12345678",
+    "device_id": "ESP32_OTA_BASE_001",
+    "default_server_url": "http://192.168.1.107:5000",
+    "ota_check_interval": "120000ms (2 minutes)",
+    "heartbeat_interval": "30000ms (30 seconds)"
+  },
+  "api_endpoints": [
+    "/api/devices/register",
+    "/api/devices/{device_id}/heartbeat",
+    "/api/ota/check/{device_id}",
+    "/api/ota/download/{firmware_key}"
+  ],
+  "compilation_info": {
+    "status": "SUCCESSFULLY_COMPILED",
+    "arduino_cli_version": "Latest",
+    "libraries_used": [
+      "WiFi",
+      "HTTPClient", 
+      "HTTPUpdate",
+      "ArduinoJson",
+      "WebServer",
+      "DNSServer",
+      "Preferences"
+    ],
+    "binary_verified": true,
+    "chip_id_compatible": true
+  }
+}

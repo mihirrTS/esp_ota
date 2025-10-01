@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PersonalCMS - Per-Device Content Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .device-item {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #2196F3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .device-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transform: translateX(5px);
+        }
+        
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .device-info h3 {
+            color: #2196F3;
+            margin-bottom: 5px;
+            font-size: 1.3rem;
+        }
+        
+        .device-nickname {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .device-id {
+            color: #999;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+        }
+        
+        .device-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .badge-active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .badge-inactive {
+            background: #f44336;
+            color: white;
+        }
+        
+        .badge-custom {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .badge-default {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .device-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .device-detail {
+            font-size: 0.9rem;
+        }
+        
+        .device-detail strong {
+            color: #333;
+        }
+        
+        .device-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .btn-warning {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #F57C00;
+        }
+        
+        .content-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 3px solid #4CAF50;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .content-title {
+            color: #333;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .content-meta {
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .content-preview {
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .navigation {
+            background: #333;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: #555;
+        }
+        
+        .footer {
+            background: #2c2c2c;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #888;
+        }
+        
+        .api-info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .api-endpoint {
+            font-family: 'Courier New', monospace;
+            background: #333;
+            color: #4CAF50;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 PersonalCMS</h1>
+            <p class="subtitle">Per-Device Content Management System with Nickname Support</p>
+        </div>
+        
+        <div class="navigation">
+            <div class="nav-links">
+                <a href="/">🏠 Dashboard</a>
+                <a href="/upload">📷 Upload Images</a>
+                <a href="/content-management">📝 Manage Content</a>
+                <a href="/content-admin">⚙️ Content Admin</a>
+                <a href="/default-content">📝 Default Content</a>
+                <a href="/ota-management">🔄 OTA Management</a>
+            </div>
+            <div style="color: white; font-size: 0.9rem;">
+                Last Updated: {{ current_time }}
+            </div>
+        </div>
+        
+        <!-- Flash Messages -->
+        <div style="padding: 30px 30px 0 30px;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}" style="
+                            padding: 12px 20px;
+                            margin-bottom: 15px;
+                            border-radius: 5px;
+                            font-weight: 500;
+                            {% if category == 'success' %}
+                                background-color: #d4edda;
+                                color: #155724;
+                                border: 1px solid #c3e6cb;
+                            {% elif category == 'error' %}
+                                background-color: #f8d7da;
+                                color: #721c24;
+                                border: 1px solid #f5c6cb;
+                            {% else %}
+                                background-color: #d1ecf1;
+                                color: #0c5460;
+                                border: 1px solid #bee5eb;
+                            {% endif %}
+                        ">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <!-- System Statistics -->
+        <div style="padding: 30px 30px 0 30px;">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.total_devices }}</div>
+                    <div class="stat-label">Total Devices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.active_devices }}</div>
+                    <div class="stat-label">Active Devices</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.custom_content_devices }}</div>
+                    <div class="stat-label">Custom Content</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.total_content }}</div>
+                    <div class="stat-label">Content Items</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard">
+            <!-- Registered Devices -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>
+                    📱 Registered Devices 
+                    <span style="font-size: 0.8rem; font-weight: normal; color: #666;">
+                        {{ devices|length }} device{{ 's' if devices|length != 1 else '' }}
+                    </span>
+                </h2>
+                
+                {% if devices %}
+                    {% for device in devices %}
+                    <div class="device-item">
+                        <div class="device-header">
+                            <div class="device-info">
+                                <h3>{{ device.nickname or device.device_name }}</h3>
+                                {% if device.nickname %}
+                                <div class="device-nickname">{{ device.device_name }}</div>
+                                {% endif %}
+                                <div class="device-id">{{ device.device_id }}</div>
+                            </div>
+                            <div class="device-badges">
+                                <span class="badge {{ 'badge-active' if device.is_active else 'badge-inactive' }}">
+                                    {{ 'Active' if device.is_active else 'Inactive' }}
+                                </span>
+                                <span class="badge {{ 'badge-custom' if device.custom_content_enabled else 'badge-default' }}">
+                                    {{ 'Custom' if device.custom_content_enabled else 'Default' }} Content
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-details">
+                            <div class="device-detail">
+                                <strong>Occupation:</strong> {{ device.occupation }}
+                            </div>
+                            <div class="device-detail">
+                                <strong>Type:</strong> {{ device.device_type }}
+                            </div>
+                            <div class="device-detail">
+                                <strong>WiFi:</strong> {{ device.wifi_ssid or 'Not set' }}
+                            </div>
+                            <div class="device-detail">
+                                <strong>Last Seen:</strong> 
+                                {% if device.last_seen %}
+                                    {{ device.last_seen.strftime('%m-%d %H:%M') }}
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="device-actions">
+                            <a href="/device/{{ device.device_id }}" class="btn btn-primary">
+                                🔧 Manage Device
+                            </a>
+                            <a href="/api/devices/{{ device.device_id }}/content" class="btn btn-success" target="_blank">
+                                📋 View Content
+                            </a>
+                            <a href="/api/devices/{{ device.device_id }}/dashboard" class="btn btn-warning" target="_blank">
+                                🖼️ Preview Dashboard
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No devices registered yet</h3>
+                        <p>Connect your ESP32 DevKit V1 devices to get started!</p>
+                        <p style="margin-top: 15px; font-family: 'Courier New', monospace; color: #888;">
+                            Server URL: <span class="api-endpoint">http://{{ request.host }}</span>
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Recent Custom Content -->
+            <div class="card">
+                <h2>📝 Recent Custom Content</h2>
+                {% if recent_content %}
+                    {% for content in recent_content %}
+                    <div class="content-item">
+                        <div class="content-header">
+                            <div class="content-title">{{ content.title }}</div>
+                            <div class="content-meta">
+                                {% set device = devices|selectattr('device_id', 'equalto', content.device_id)|first %}
+                                {{ (device.nickname or device.device_name) if device else content.device_id }}
+                            </div>
+                        </div>
+                        <div class="content-meta" style="margin-bottom: 8px;">
+                            {{ content.content_type|title }} → {{ content.subcategory.replace('_', ' ')|title }}
+                        </div>
+                        <div class="content-preview">
+                            {{ content.content[:100] }}{% if content.content|length > 100 %}...{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No custom content yet</h3>
+                        <p>Add custom content for your devices to see it here</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Recent Images -->
+            <div class="card">
+                <h2>🖼️ Recent Images</h2>
+                {% if images %}
+                    {% for image in images %}
+                    <div class="content-item">
+                        <div class="content-header">
+                            <div class="content-title">{{ image.filename }}</div>
+                            <div class="content-meta">{% if image.file_size %}{{ (image.file_size / 1024)|round|int }} KB{% else %}Unknown size{% endif %}</div>
+                        </div>
+                        <div class="content-meta" style="margin-bottom: 8px;">
+                            Uploaded: {{ image.uploaded_at.strftime('%Y-%m-%d %H:%M') }}
+                        </div>
+                        <div class="content-preview">
+                            {% set assignments = image.device_assignments|from_json %}
+                            {% if assignments %}
+                                Assigned to: {{ assignments|length }} device{{ 's' if assignments|length != 1 else '' }}
+                                <small style="display:block; color:#6c757d;">{{ assignments|join(', ') }}</small>
+                            {% else %}
+                                <span style="color:#888;">Available for assignment</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <a href="/upload" class="btn btn-primary" style="margin-top: 15px;">Upload More Images</a>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>No images uploaded yet</h3>
+                        <p><a href="/upload">Upload images</a> for your devices</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Device Image Assignment Section -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>🖼️ Manage Device Images</h2>
+                <form method="post" action="/assign-device-images">
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#e9ecef;">
+                                <th style="padding:8px;">Device</th>
+                                <th style="padding:8px;">Assigned Images</th>
+                                <th style="padding:8px;">Assign/Unassign</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for device in devices %}
+                            <tr style="border-bottom:1px solid #eee;">
+                                <td style="padding:8px;">
+                                    <strong>{{ device.device_name }}</strong><br>
+                                    <small>{{ device.device_id }}</small>
+                                </td>
+                                <td style="padding:8px;">
+                                    {% set assigned_images = [] %}
+                                    {% for img in images %}
+                                        {% set assignments = img.device_assignments|from_json %}
+                                        {% if device.device_id in assignments %}
+                                            {% set assigned_images = assigned_images + [img] %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if assigned_images %}
+                                        <ul style="margin:0; padding-left:18px;">
+                                        {% for img in assigned_images %}
+                                            <li>{{ img.filename }}</li>
+                                        {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span style="color:#888;">No images assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding:8px;">
+                                    <select name="assign_{{ device.device_id }}" multiple style="width:180px;">
+                                        {% for img in images %}
+                                            {% set assignments = img.device_assignments|from_json %}
+                                            <option value="{{ img.id }}" {% if device.device_id in assignments %}selected{% endif %}>{{ img.filename }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button type="submit" class="btn btn-success" style="margin-top:12px;">Update Assignments</button>
+                </form>
+            </div>
+            
+            <!-- API Information -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>🔌 Per-Device API Endpoints</h2>
+                <div class="api-info">
+                    <p><strong>Device Registration with Nickname:</strong></p>
+                    <span class="api-endpoint">POST /api/devices/register</span>
+                    <code style="display: block; margin: 8px 0; padding: 8px; background: #f5f5f5; border-radius: 3px; font-size: 0.8rem;">
+{"device_id": "ESP32_001", "device_name": "Living Room", "nickname": "LivingTV", "occupation": "Engineer", ...}
+                    </code>
+                    
+                    <p><strong>Per-Device Content (respects custom/default mode):</strong></p>
+                    <span class="api-endpoint">GET /api/devices/{device_id}/content</span>
+                    
+                    <p><strong>Add Custom Content:</strong></p>
+                    <span class="api-endpoint">POST /api/devices/{device_id}/content/custom</span>
+                    
+                    <p><strong>Manage Nickname:</strong></p>
+                    <span class="api-endpoint">PUT /api/devices/{device_id}/nickname</span>
+                    
+                    <p><strong>Toggle Content Mode:</strong></p>
+                    <span class="api-endpoint">PUT /api/devices/{device_id}/content-mode</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 PersonalCMS - Unified Per-Device Content Management</p>
+            <p>Individual CMS for each device • Nickname support • Custom content management</p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh device status every 30 seconds
+        setInterval(() => {
+            // You could add AJAX calls here to update device status
+            console.log('Auto-refresh placeholder');
+        }, 30000);
+    </script>
+</body>
+</html>

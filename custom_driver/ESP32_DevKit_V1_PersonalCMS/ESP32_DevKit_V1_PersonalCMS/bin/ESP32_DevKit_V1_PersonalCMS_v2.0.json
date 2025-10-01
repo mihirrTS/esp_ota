@@ -1,0 +1,96 @@
+{
+  "firmware_name": "ESP32_DevKit_V1_PersonalCMS_v2.0.bin",
+  "version": "2.0",
+  "device_type": "ESP32_PersonalCMS",
+  "description": "COMPILED PersonalCMS firmware with proper HTTPUpdate API fixes. Includes e-ink display, sensors, NFC, and OTA support. Compiled with Arduino CLI and ESP32 Core 3.x compatibility.",
+  "features": [
+    "Complete PersonalCMS functionality",
+    "E-ink display (2.9 inch Waveshare)",
+    "BMP280 temperature/humidity sensor",
+    "IR motion detection", 
+    "NFC VCard writing",
+    "WiFi captive portal setup",
+    "OTA updates every 2 minutes",
+    "Device registration and heartbeat",
+    "Content management API",
+    "HTTPUpdate API compatibility fixes (ESP32 Core 3.x)",
+    "Automatic cross-firmware updates",
+    "Real compiled binary (1.13MB)"
+  ],
+  "compilation_date": "2025-10-01",
+  "size_bytes": 1133072,
+  "esp32_core_version": "3.3.1",
+  "arduino_version": "2.3.2",
+  "compiled_with": "Arduino CLI",
+  "fixes_included": [
+    "HTTPUpdate API compatibility with ESP32 Core 3.x",
+    "WiFiClient and HTTPClient proper initialization",
+    "Device registration with occupation field",
+    "Enhanced error handling and logging",
+    "Improved OTA reliability",
+    "Cross-firmware update support",
+    "Proper ESP32 binary headers"
+  ],
+  "hardware_requirements": {
+    "board": "ESP32 DevKit V1",
+    "display": "Waveshare 2.9inch e-Paper Module (optional)",
+    "sensors": ["BMP280 (optional)", "IR Motion Sensor (optional)"],
+    "nfc": "PN532 NFC Module (optional)",
+    "memory": "4MB Flash minimum"
+  },
+  "pin_assignments": {
+    "display_pins": {
+      "busy": "GPIO 4",
+      "rst": "GPIO 16", 
+      "dc": "GPIO 17",
+      "cs": "GPIO 18",
+      "clk": "GPIO 5",
+      "din": "GPIO 19"
+    },
+    "sensor_pins": {
+      "bmp280_sda": "GPIO 21",
+      "bmp280_scl": "GPIO 22",
+      "ir_motion": "GPIO 14"
+    },
+    "nfc_pins": {
+      "sda": "GPIO 21",
+      "scl": "GPIO 22"
+    }
+  },
+  "api_endpoints": [
+    "/api/devices/register",
+    "/api/devices/{device_id}/heartbeat", 
+    "/api/devices/{device_id}/sensor-data",
+    "/api/devices/{device_id}/images-sequence",
+    "/api/ota/check/{device_id}",
+    "/api/ota/download/{firmware_key}"
+  ],
+  "configuration": {
+    "captive_portal_ssid": "ESP32-PersonalCMS-Setup",
+    "captive_portal_password": "12345678",
+    "device_id": "ESP32_PersonalCMS_001",
+    "default_server_url": "http://192.168.1.107:5000",
+    "ota_check_interval": "120000ms (2 minutes)",
+    "heartbeat_interval": "30000ms (30 seconds)",
+    "sensor_read_interval": "60000ms (1 minute)"
+  },
+  "compilation_info": {
+    "status": "SUCCESSFULLY_COMPILED",
+    "arduino_cli_version": "Latest",
+    "libraries_used": [
+      "WiFi",
+      "HTTPClient",
+      "HTTPUpdate",
+      "ArduinoJson", 
+      "WebServer",
+      "DNSServer",
+      "Preferences",
+      "Wire",
+      "SPI",
+      "GxEPD2",
+      "Adafruit_BMP280"
+    ],
+    "binary_verified": true,
+    "chip_id_compatible": true
+  }
+}

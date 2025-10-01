@@ -1,0 +1,88 @@
+{
+  "firmware_name": "ESP32_DevKit_V1_LED_Blink_v2.0.bin",
+  "version": "2.0",
+  "device_type": "ESP32_LED_Blink",
+  "description": "COMPILED LED pattern firmware with proper HTTPUpdate API fixes. Features multiple LED modes and web configuration. Compiled with Arduino CLI and ESP32 Core 3.x compatibility.",
+  "features": [
+    "Multiple LED pattern modes (Heartbeat, Fast/Slow Blink, Breathing, Custom)",
+    "Web-based LED configuration interface",
+    "WiFi captive portal setup",
+    "OTA updates every 2 minutes", 
+    "Device registration and heartbeat",
+    "Real-time pattern switching",
+    "NVS configuration storage",
+    "HTTPUpdate API compatibility fixes (ESP32 Core 3.x)",
+    "External LED support (GPIO 4)",
+    "PWM brightness control",
+    "Automatic cross-firmware updates",
+    "Real compiled binary (1.13MB)"
+  ],
+  "led_modes": [
+    "LED_HEARTBEAT - Quick double blink every 2 seconds",
+    "LED_FAST_BLINK - Fast blinking every 200ms",
+    "LED_SLOW_BLINK - Slow blinking (configurable interval)",
+    "LED_BREATHING - Smooth PWM breathing effect",
+    "LED_PATTERN - Custom 3-blink pattern with pause"
+  ],
+  "compilation_date": "2025-10-01",
+  "size_bytes": 1135312,
+  "esp32_core_version": "3.3.1",
+  "arduino_version": "2.3.2",
+  "compiled_with": "Arduino CLI",
+  "fixes_included": [
+    "HTTPUpdate API compatibility with ESP32 Core 3.x",
+    "WiFiClient and HTTPClient proper initialization",
+    "Enhanced LED pattern engine",
+    "Improved web interface with real-time controls",
+    "Better OTA error handling",
+    "Device registration with occupation field",
+    "Cross-firmware update support",
+    "Proper ESP32 binary headers"
+  ],
+  "hardware_requirements": {
+    "board": "ESP32 DevKit V1",
+    "led": "Built-in LED (GPIO 2) + optional external LED (GPIO 4)",
+    "memory": "4MB Flash minimum"
+  },
+  "configuration": {
+    "captive_portal_ssid": "ESP32-LED-OTA-Setup",
+    "captive_portal_password": "12345678",
+    "device_id": "ESP32_OTA_LED_001",
+    "default_server_url": "http://192.168.1.107:5000",
+    "ota_check_interval": "120000ms (2 minutes)",
+    "heartbeat_interval": "30000ms (30 seconds)",
+    "led_pins": {
+      "built_in": "GPIO 2",
+      "external": "GPIO 4 (optional)"
+    }
+  },
+  "api_endpoints": [
+    "/api/devices/register",
+    "/api/devices/{device_id}/heartbeat",
+    "/api/ota/check/{device_id}",
+    "/api/ota/download/{firmware_key}"
+  ],
+  "web_interface": {
+    "led_control": "Real-time LED mode selection",
+    "brightness_control": "PWM brightness adjustment (0-255)",
+    "interval_config": "Blink interval configuration (100-5000ms)",
+    "external_led": "Enable/disable external LED on GPIO 4",
+    "wifi_setup": "Network configuration",
+    "ota_settings": "Update server configuration"
+  },
+  "compilation_info": {
+    "status": "SUCCESSFULLY_COMPILED",
+    "arduino_cli_version": "Latest",
+    "libraries_used": [
+      "WiFi",
+      "HTTPClient",
+      "HTTPUpdate", 
+      "ArduinoJson",
+      "WebServer",
+      "DNSServer",
+      "Preferences"
+    ],
+    "binary_verified": true,
+    "chip_id_compatible": true
+  }
+}

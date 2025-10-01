@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Device Content - {{ device.device_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('device_detail', device_id=device.device_id) }}">{{ device.device_name }}</a></li>
+                    <li class="breadcrumb-item active">Content</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-file-text"></i> Content for {{ device.device_name }}</h4>
+                    <small class="text-muted">Device ID: {{ device.device_id }}</small>
+                </div>
+                <div class="card-body">
+                    {% if content %}
+                        {% for category, subcategories in content.items() %}
+                        <div class="mb-4">
+                            <h5 class="text-primary">{{ category.title() }}</h5>
+                            {% for subcategory, items in subcategories.items() %}
+                            <div class="mb-3">
+                                <h6 class="text-secondary">{{ subcategory.replace('_', ' ').title() }}</h6>
+                                <div class="content-items">
+                                    {% if items %}
+                                        {% for item in items[:3] %}
+                                        <div class="alert alert-light border-left-primary">
+                                            {% if item is mapping %}
+                                                {% if item.get('question') %}
+                                                    <strong>Q:</strong> {{ item.question }}<br>
+                                                    <strong>A:</strong> {{ item.answer }}
+                                                {% elif item.get('title') %}
+                                                    <strong>{{ item.title }}</strong><br>
+                                                    {{ item.get('summary', item.get('content', ''))[:200] }}...
+                                                {% else %}
+                                                    {{ item }}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ item }}
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                        {% if items|length > 3 %}
+                                        <small class="text-muted">... and {{ items|length - 3 }} more items</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <p class="text-muted">No content available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            No content configured for this device yet.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('device_detail', device_id=device.device_id) }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Device
+                    </a>
+                    <a href="{{ url_for('preview_dashboard', device_id=device.device_id) }}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> Preview Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

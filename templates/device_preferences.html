@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Device Preferences - {{ device.nickname or device.device_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>
+                        <i class="fas fa-cog me-2"></i>
+                        Device Preferences: {{ device.nickname or device.device_name }}
+                    </h4>
+                    <a href="{{ url_for('device_detail', device_id=device.device_id) }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Device
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Basic Information</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="device_name" class="form-label">Device Name</label>
+                                    <input type="text" class="form-control" id="device_name" name="device_name" 
+                                           value="{{ device.device_name }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="nickname" class="form-label">Nickname (Optional)</label>
+                                    <input type="text" class="form-control" id="nickname" name="nickname" 
+                                           value="{{ device.nickname or '' }}" placeholder="Friendly display name">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="occupation" class="form-label">Occupation</label>
+                                    <input type="text" class="form-control" id="occupation" name="occupation" 
+                                           value="{{ device.occupation }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5>Content Preferences</h5>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">😄 Jokes</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="dad_jokes" name="jokes_prefs" value="dad_jokes"
+                                               {% if 'dad_jokes' in current_prefs.get('jokes', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="dad_jokes">Dad Jokes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="programming_jokes" name="jokes_prefs" value="programming_jokes"
+                                               {% if 'programming_jokes' in current_prefs.get('jokes', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="programming_jokes">Programming Jokes</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="clean_jokes" name="jokes_prefs" value="clean_jokes"
+                                               {% if 'clean_jokes' in current_prefs.get('jokes', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="clean_jokes">Clean Jokes</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">🧩 Riddles</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="easy_riddles" name="riddles_prefs" value="easy_riddles"
+                                               {% if 'easy_riddles' in current_prefs.get('riddles', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="easy_riddles">Easy Riddles</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="math_riddles" name="riddles_prefs" value="math_riddles"
+                                               {% if 'math_riddles' in current_prefs.get('riddles', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="math_riddles">Math Riddles</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="logic_riddles" name="riddles_prefs" value="logic_riddles"
+                                               {% if 'logic_riddles' in current_prefs.get('riddles', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="logic_riddles">Logic Riddles</label>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">📰 News</label>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="tech_news" name="news_prefs" value="tech_news"
+                                               {% if 'tech_news' in current_prefs.get('news', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="tech_news">Tech News</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="sports_news" name="news_prefs" value="sports_news"
+                                               {% if 'sports_news' in current_prefs.get('news', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="sports_news">Sports News</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="world_news" name="news_prefs" value="world_news"
+                                               {% if 'world_news' in current_prefs.get('news', []) %}checked{% endif %}>
+                                        <label class="form-check-label" for="world_news">World News</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Preferences
+                            </button>
+                            <a href="{{ url_for('device_detail', device_id=device.device_id) }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management - {{ device.nickname or device.device_name or device.device_id }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .device-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-card h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .status.active { background: #28a745; }
+        .status.inactive { background: #dc3545; }
+        
+        .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .content-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
+        
+        .content-priority {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: #667eea;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .device-management {
+            border-top: 2px solid #ddd;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .nickname-form {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .assigned-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .image-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        
+        .image-card.assigned {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        /* Preferences editing styles */
+        #preferences-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        #preferences-form h4 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        #preferences-form h5 {
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        #preferences-form label {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+            color: #495057;
+        }
+        
+        #preferences-form input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            margin: 0 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav-links">
+            <a href="/">🏠 Dashboard</a>
+            <a href="/content-management">📝 Content Management</a>
+            <a href="/content-admin">⚙️ Content Admin</a>
+            <a href="/upload">📷 Upload Images</a>
+        </div>
+        
+        <!-- Device Header -->
+        <div class="header">
+            <h1>📱 Device Management</h1>
+            <h2>{{ device.nickname or device.device_name or device.device_id }}</h2>
+            <p><strong>Device ID:</strong> {{ device.device_id }}</p>
+            <p><strong>Status:</strong> 
+                <span class="status {% if device.is_active %}active{% else %}inactive{% endif %}">
+                    {% if device.is_active %}🟢 Active{% else %}🔴 Inactive{% endif %}
+                </span>
+            </p>
+            <p><strong>Last Seen:</strong> 
+                {% if device.last_seen %}
+                    {{ device.last_seen.strftime('%Y-%m-%d %H:%M:%S') }}
+                {% else %}
+                    Never
+                {% endif %}
+            </p>
+        </div>
+        
+        <!-- Device Information -->
+        <div class="device-info">
+            <!-- Device Details -->
+            <div class="info-card">
+                <h3>📋 Device Details</h3>
+                <p><strong>Type:</strong> {{ device.device_type or 'ESP32 DevKit V1' }}</p>
+                <p><strong>Name:</strong> {{ device.device_name or 'Unknown' }}</p>
+                <p><strong>Nickname:</strong> {{ device.nickname or 'Not set' }}</p>
+                <p><strong>Custom Content:</strong> 
+                    {% if device.custom_content_enabled %}🟢 Enabled{% else %}🔴 Disabled{% endif %}
+                </p>
+                
+                <!-- Nickname Update Form -->
+                <div class="nickname-form">
+                    <form method="POST" action="/device/{{ device.device_id }}/update-nickname">
+                        <div class="form-group">
+                            <label for="nickname">Update Nickname:</label>
+                            <input type="text" id="nickname" name="nickname" value="{{ device.nickname or '' }}" placeholder="Enter friendly name">
+                        </div>
+                        <button type="submit" class="btn">💾 Update Nickname</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Content Preferences -->
+            <div class="info-card">
+                <h3>🎯 Content Preferences</h3>
+                <div class="preferences-display" id="preferences-display">
+                    {% if device.preferences %}
+                        {% set prefs = device.preferences|from_json %}
+                        {% for category, items in prefs.items() %}
+                            <p><strong>{{ category.title() }}:</strong></p>
+                            <ul>
+                                {% for item in items %}
+                                    <li>{{ item.replace('_', ' ').title() }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endfor %}
+                    {% else %}
+                        <p>No preferences set</p>
+                    {% endif %}
+                    <button type="button" onclick="editPreferences()" class="btn btn-secondary" style="margin-top: 10px;">
+                        ✏️ Edit Preferences
+                    </button>
+                </div>
+                
+                <!-- Edit Preferences Form (Hidden by default) -->
+                <form method="POST" action="/device/{{ device.device_id }}/preferences" id="preferences-form" style="display: none;">
+                    <h4>Update Content Preferences:</h4>
+                    
+                    {% set current_prefs = device.preferences|from_json if device.preferences else {} %}
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0;">
+                        <div>
+                            <h5>😄 Jokes</h5>
+                            <label><input type="checkbox" name="prefs" value="dad_jokes" 
+                                {{ 'checked' if 'dad_jokes' in current_prefs.get('jokes', []) }}> Dad Jokes</label><br>
+                            <label><input type="checkbox" name="prefs" value="programming_jokes"
+                                {{ 'checked' if 'programming_jokes' in current_prefs.get('jokes', []) }}> Programming</label><br>
+                            <label><input type="checkbox" name="prefs" value="clean_jokes"
+                                {{ 'checked' if 'clean_jokes' in current_prefs.get('jokes', []) }}> Clean Jokes</label><br>
+                        </div>
+                        <div>
+                            <h5>🧩 Riddles</h5>
+                            <label><input type="checkbox" name="prefs" value="easy_riddles"
+                                {{ 'checked' if 'easy_riddles' in current_prefs.get('riddles', []) }}> Easy Riddles</label><br>
+                            <label><input type="checkbox" name="prefs" value="logic_riddles"
+                                {{ 'checked' if 'logic_riddles' in current_prefs.get('riddles', []) }}> Logic Puzzles</label><br>
+                            <label><input type="checkbox" name="prefs" value="math_riddles"
+                                {{ 'checked' if 'math_riddles' in current_prefs.get('riddles', []) }}> Math Riddles</label><br>
+                        </div>
+                        <div>
+                            <h5>📰 News</h5>
+                            <label><input type="checkbox" name="prefs" value="tech_news"
+                                {{ 'checked' if 'tech_news' in current_prefs.get('news', []) }}> Tech News</label><br>
+                            <label><input type="checkbox" name="prefs" value="world_news"
+                                {{ 'checked' if 'world_news' in current_prefs.get('news', []) }}> World News</label><br>
+                            <label><input type="checkbox" name="prefs" value="science_news"
+                                {{ 'checked' if 'science_news' in current_prefs.get('news', []) }}> Science News</label><br>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <button type="submit" class="btn btn-primary">💾 Save Preferences</button>
+                        <button type="button" onclick="cancelPreferencesEdit()" class="btn btn-secondary">❌ Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Custom Content Management -->
+        <div class="content-section">
+            <h3>📝 Custom Content Management</h3>
+            
+            <!-- Add New Content Form -->
+            <form method="POST" action="/device/{{ device.device_id }}/add-content">
+                <div class="form-group">
+                    <label for="content_type">Content Type:</label>
+                    <select id="content_type" name="content_type" required>
+                        <option value="text">📄 Text Message</option>
+                        <option value="announcement">📢 Announcement</option>
+                        <option value="reminder">⏰ Reminder</option>
+                        <option value="joke">😄 Custom Joke</option>
+                        <option value="quote">💭 Quote</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">Content:</label>
+                    <textarea id="content" name="content" placeholder="Enter your custom content..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="priority">Priority (1-10, higher = more important):</label>
+                    <input type="number" id="priority" name="priority" value="5" min="1" max="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="expires_at">Expires At (optional):</label>
+                    <input type="datetime-local" id="expires_at" name="expires_at">
+                </div>
+                
+                <button type="submit" class="btn">➕ Add Custom Content</button>
+            </form>
+            
+            <!-- Existing Custom Content -->
+            <h4>📋 Current Custom Content</h4>
+            {% if custom_content %}
+                <ul class="content-list">
+                    {% for content in custom_content %}
+                        <li class="content-item">
+                            <div class="content-priority">Priority: {{ content.priority }}</div>
+                            <h5>{{ content.content_type.title() }}</h5>
+                            <p>{{ content.content }}</p>
+                            <small>
+                                Created: {{ content.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                {% if content.expires_at %}
+                                    | Expires: {{ content.expires_at.strftime('%Y-%m-%d %H:%M') }}
+                                {% endif %}
+                            </small>
+                            <div style="margin-top: 10px;">
+                                <a href="/device/{{ device.device_id }}/content/{{ content.id }}/delete" 
+                                   class="btn btn-danger" 
+                                   onclick="return confirm('Delete this content?')">🗑️ Delete</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No custom content added yet. Add some above!</p>
+            {% endif %}
+        </div>
+        
+        <!-- Assigned Images -->
+        <div class="content-section">
+            <h3>📸 Assigned Images</h3>
+            {% if assigned_images %}
+                <div class="assigned-images">
+                    {% for image in assigned_images %}
+                        <div class="image-card assigned">
+                            <h5>{{ image.original_filename }}</h5>
+                            <p><strong>Size:</strong> {{ (image.file_size / 1024)|round(2) }} KB</p>
+                            <p><strong>Format:</strong> BMP (for ESP32)</p>
+                            <p><strong>Uploaded:</strong> {{ image.upload_date.strftime('%Y-%m-%d') }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No images assigned to this device. <a href="/upload" class="btn">📷 Upload Images</a></p>
+            {% endif %}
+        </div>
+        
+        <!-- Device Actions -->
+        <div class="content-section">
+            <h3>🔧 Device Actions</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <a href="/device/{{ device.device_id }}/toggle-content-mode" class="btn">
+                    🔄 Toggle Content Mode
+                </a>
+                <a href="/api/devices/{{ device.device_id }}/dashboard" class="btn" target="_blank">
+                    📊 View Dashboard
+                </a>
+                <a href="/api/devices/{{ device.device_id }}/image" class="btn" target="_blank">
+                    🖼️ View Current Image
+                </a>
+                <a href="/api/devices/{{ device.device_id }}/images-sequence" class="btn" target="_blank">
+                    📜 View Image Sequence
+                </a>
+            </div>
+            
+            <!-- Device Management Actions -->
+            <div style="border-top: 2px solid #ddd; padding-top: 20px; margin-top: 20px;">
+                <h4 style="color: #666; margin-bottom: 15px;">🔧 Device Management</h4>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button onclick="disconnectDevice('{{ device.device_id }}', '{{ device.nickname or device.device_name }}')" 
+                            class="btn btn-warning" style="background: #ff9800;">
+                        🔌 Disconnect Device
+                    </button>
+                    <button onclick="removeDevice('{{ device.device_id }}', '{{ device.nickname or device.device_name }}')" 
+                            class="btn btn-danger" style="background: #f44336;">
+                        🗑️ Remove Device
+                    </button>
+                </div>
+                <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                    <strong>Disconnect:</strong> Keeps device data but marks as inactive<br>
+                    <strong>Remove:</strong> Permanently deletes device and all content
+                </div>
+            </div>
+        </div>
+
+        <!-- Fallback Management -->
+        <div class="content-section">
+            <h3>🧯 Fallback Image</h3>
+            <p>Fallback is used when no other image is available on device.</p>
+            <div style="display:flex; gap:12px; align-items:center;">
+                <a href="/dashboards/{{ device.device_id }}_fallback.bmp" class="btn" target="_blank">🔍 Preview Fallback</a>
+                <form action="/device/{{ device.device_id }}/fallback/regenerate" method="post" style="display:inline;">
+                    <button class="btn btn-warning">♻️ Regenerate Fallback</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Management JavaScript -->
+    <script>
+        function disconnectDevice(deviceId, deviceName) {
+            if (confirm(`🔌 Disconnect Device\n\nAre you sure you want to disconnect "${deviceName}"?\n\n⚠️ This will:\n• Mark the device as inactive\n• Preserve all device data and content\n• Device can be reconnected later\n\nClick OK to disconnect.`)) {
+                
+                // Show loading indicator
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Disconnecting...';
+                btn.disabled = true;
+                
+                fetch(`/api/devices/${deviceId}/unlink`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert(`✅ Device Disconnected\n\n"${deviceName}" has been successfully disconnected.\n\nDevice data has been preserved and can be reconnected later.`);
+                        window.location.reload();
+                    } else {
+                        alert(`❌ Disconnect Failed\n\nError: ${data.error || 'Unknown error'}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(`❌ Disconnect Failed\n\nNetwork error: ${error.message}`);
+                })
+                .finally(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+            }
+        }
+        
+        function removeDevice(deviceId, deviceName) {
+            // First confirmation
+            if (!confirm(`🚨 WARNING: Remove Device\n\nAre you sure you want to PERMANENTLY REMOVE "${deviceName}"?\n\n⚠️ This will PERMANENTLY:\n• Delete the device from the server\n• Remove ALL custom content\n• Remove ALL image assignments\n• Delete ALL device data\n\n❌ THIS CANNOT BE UNDONE!\n\nClick OK to continue with removal warning.`)) {
+                return;
+            }
+            
+            // Second confirmation with typing requirement
+            const confirmText = prompt(`🚨 FINAL CONFIRMATION\n\nTo confirm PERMANENT REMOVAL of "${deviceName}", please type:\nREMOVE\n\n(Type exactly: REMOVE)`);
+            
+            if (confirmText !== 'REMOVE') {
+                if (confirmText !== null) {
+                    alert('❌ Removal cancelled - incorrect confirmation text');
+                }
+                return;
+            }
+            
+            // Show loading indicator
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Removing...';
+            btn.disabled = true;
+            
+            fetch(`/api/devices/${deviceId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`✅ Device Removed\n\n"${deviceName}" has been permanently removed.\n\nCleanup Summary:\n• Custom content deleted: ${data.cleanup_summary?.custom_content_deleted || 0}\n• Image assignments removed: ${data.cleanup_summary?.image_assignments_removed || 0}\n\nRedirecting to main page...`);
+                    window.location.href = '/';
+                } else {
+                    alert(`❌ Removal Failed\n\nError: ${data.error || 'Unknown error'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(`❌ Removal Failed\n\nNetwork error: ${error.message}`);
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+        
+        function editPreferences() {
+            document.getElementById('preferences-display').style.display = 'none';
+            document.getElementById('preferences-form').style.display = 'block';
+        }
+        
+        function cancelPreferencesEdit() {
+            document.getElementById('preferences-display').style.display = 'block';
+            document.getElementById('preferences-form').style.display = 'none';
+        }
+        
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-messages .alert');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
