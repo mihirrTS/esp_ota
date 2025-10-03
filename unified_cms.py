@@ -992,25 +992,23 @@ def force_firmware_update(device_id):
 
 @app.route('/api/ota/upload', methods=['POST'])
 def upload_firmware():
-    """Upload new firmware file"""
+    """Upload new firmware file with automatic versioning"""
     try:
         if 'firmware' not in request.files:
             return jsonify({'error': 'No firmware file provided'}), 400
         
         file = request.files['firmware']
-        version = request.form.get('version')
         device_type = request.form.get('device_type', 'ESP32_PersonalCMS')
-        description = request.form.get('description', '')
+        description = request.form.get('description', 'Auto-uploaded firmware')
         auto_assign = request.form.get('auto_assign') == 'true'
         
-        if not version:
-            return jsonify({'error': 'Version is required'}), 400
+        # Version is now auto-generated, no manual input required
         
         # Upload firmware
-        result = ota_manager.upload_firmware(file, version, device_type, description, auto_assign)
+        result = ota_manager.upload_firmware(file, device_type, description, auto_assign)
         
         if result['success']:
-            logger.info(f"Firmware uploaded: {device_type} v{version}")
+            logger.info(f"Firmware uploaded: {device_type} v{result.get('version', 'auto')}")
             return jsonify(result)
         else:
             return jsonify(result), 400
@@ -1062,10 +1060,11 @@ def device_heartbeat(device_id):
         
         device = Device.query.filter_by(device_id=device_id).first()
         if not device:
-            # Create device if it doesn't exist (for OTA-only devices)
+            # Create device if it doesn't exist (for OTA-enabled devices)
             device = Device(
                 device_id=device_id,
                 device_name=data.get('device_name', device_id),
+                occupation=data.get('occupation', 'Device User'),  # Provide default occupation
                 device_type=data.get('device_type', 'ESP32_OTA'),
                 last_seen=datetime.utcnow(),
                 is_connected=True,
@@ -1178,26 +1177,28 @@ def ota_upload():
                 flash('No firmware file selected', 'error')
                 return redirect(url_for('ota_upload'))
             
-            version = request.form.get('version')
+            version = request.form.get('version')  # Optional now
             device_type = request.form.get('device_type')
-            description = request.form.get('description', '')
+            description = request.form.get('description', 'Uploaded via web interface')
             auto_assign = 'auto_assign' in request.form
             
-            print(f"Upload params - version: {version}, device_type: {device_type}, file: {file.filename}")
+            print(f"Upload params - device_type: {device_type}, file: {file.filename}")
+            print(f"Note: Version will be auto-generated")
             
-            if not version or not device_type:
-                print(f"ERROR: Missing required fields - version: {version}, device_type: {device_type}")
-                flash('Version and device type are required', 'error')
+            if not device_type:
+                print(f"ERROR: Missing required field - device_type: {device_type}")
+                flash('Device type is required', 'error')
                 return redirect(url_for('ota_upload'))
             
             # Upload firmware
             print("Calling ota_manager.upload_firmware")
-            result = ota_manager.upload_firmware(file, version, device_type, description, auto_assign)
+            result = ota_manager.upload_firmware(file, device_type, description, auto_assign)
             print(f"Upload result: {result}")
             
             if result['success']:
-                flash(f'Firmware uploaded successfully: {device_type} v{version}', 'success')
-                print(f"Upload successful: {device_type} v{version}")
+                auto_version = result.get('version', 'auto')
+                flash(f'Firmware uploaded successfully: {device_type} v{auto_version}', 'success')
+                print(f"Upload successful: {device_type} v{auto_version}")
                 return redirect(url_for('ota_management'))
             else:
                 flash(f'Upload failed: {result["error"]}', 'error')

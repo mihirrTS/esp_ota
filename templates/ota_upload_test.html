@@ -31,8 +31,12 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="version" class="form-label">Version</label>
-                        <input type="text" class="form-control" name="version" id="version" value="2.0" required>
+                        <label for="version" class="form-label">Version (Auto-Generated)</label>
+                        <input type="text" class="form-control" name="version" id="version" 
+                               placeholder="Auto-generated timestamp version" readonly>
+                        <div class="form-text text-success">
+                            <i class="fas fa-magic"></i> Version will be automatically generated using timestamp format: YYYYMMDD.HHMMSS
+                        </div>
                     </div>
                     
                     <div class="mb-3">

@@ -25,6 +25,7 @@
 // Device Configuration
 String deviceID = "ESP32_OTA_BASE_001";
 String deviceName = "";
+String occupation = "";
 String serverURL = "";
 String otaUsername = "";
 String otaPassword = "";
@@ -72,7 +73,7 @@ const unsigned long OTA_CHECK_INTERVAL = 120000; // 2 minutes
 const unsigned long CONTENT_CHECK_INTERVAL = 30000; // 30 seconds
 unsigned long lastOTACheck = 0;
 unsigned long lastContentCheck = 0;
-String currentFirmwareVersion = "2.0.0";
+String currentFirmwareVersion = "2.4.0";
 bool otaInProgress = false;
 
 // Captive portal state
@@ -307,6 +308,7 @@ void handleRoot() {
             <div class="section">
                 <h3>Device Information</h3>
                 <input type="text" name="device_name" placeholder="Device Name" required>
+                <input type="text" name="occupation" placeholder="Your Occupation" required>
             </div>
             
             <div class="section">
@@ -388,6 +390,7 @@ void handleRoot() {
 
 void handleSubmit() {
   deviceName = server.arg("device_name");
+  occupation = server.arg("occupation");
   
   wifiSSID = server.arg("wifi_ssid");
   if (wifiSSID == "custom") {
@@ -437,6 +440,7 @@ void loadConfiguration() {
   nvs.begin("esp32ota", false);
   
   deviceName = nvs.getString("device_name", "");
+  occupation = nvs.getString("occupation", "");
   wifiSSID = nvs.getString("wifi_ssid", "");
   wifiPassword = nvs.getString("wifi_password", "");
   serverURL = nvs.getString("server_url", "");
@@ -455,6 +459,7 @@ void saveConfiguration() {
   nvs.begin("esp32ota", false);
   
   nvs.putString("device_name", deviceName);
+  nvs.putString("occupation", occupation);
   nvs.putString("wifi_ssid", wifiSSID);
   nvs.putString("wifi_password", wifiPassword);
   nvs.putString("server_url", serverURL);
@@ -519,6 +524,7 @@ void checkForOTAUpdate() {
   http.begin(serverURL + "/api/ota/check/" + deviceID);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-Device-Version", currentFirmwareVersion);
+  http.addHeader("X-Device-Type", "ESP32_OTA_Base");
   
   int httpResponseCode = http.GET();
   
@@ -625,7 +631,8 @@ void sendHeartbeat() {
   DynamicJsonDocument doc(512);
   doc["device_id"] = deviceID;
   doc["device_name"] = deviceName;
-  doc["occupation"] = "Personal CMS Device";
+  doc["occupation"] = occupation.length() > 0 ? occupation : "Device User";
+  doc["device_type"] = "ESP32_OTA_Base";
   doc["version"] = currentFirmwareVersion;
   doc["uptime"] = millis() / 1000;
   doc["free_heap"] = ESP.getFreeHeap();

@@ -102,13 +102,12 @@ class OTAManager:
             logger.error(f"Failed to calculate hash for {filepath}: {e}")
             return None
     
-    def upload_firmware(self, file, version, device_type, description="", auto_assign=False):
+    def upload_firmware(self, file, device_type, description="", auto_assign=False):
         """
-        Upload a new firmware file
+        Upload a new firmware file with automatic versioning
         
         Args:
             file: Uploaded file object
-            version: Version string (e.g., "2.1.0")
             device_type: Type of device (e.g., "ESP32_PersonalCMS", "ESP32_OTA_Base", "ESP32_LED_Blink")
             description: Optional description
             auto_assign: Whether to auto-assign to all devices of this type
@@ -125,9 +124,12 @@ class OTAManager:
             if not file.filename.lower().endswith('.bin'):
                 return {'success': False, 'error': 'Only .bin files are allowed'}
             
+            # Auto-generate version based on timestamp (YYYYMMDD.HHMMSS format)
+            timestamp = datetime.now()
+            version = timestamp.strftime('%Y%m%d.%H%M%S')
+            
             # Create secure filename
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            safe_filename = f"{device_type}_{version}_{timestamp}.bin"
+            safe_filename = f"{device_type}_{version}.bin"
             firmware_path = os.path.join(self.firmware_folder, safe_filename)
             
             # Save file

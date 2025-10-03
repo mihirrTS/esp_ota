@@ -44,10 +44,9 @@ String serverURL = "";
 // OTA Configuration
 String otaUsername = "";
 String otaPassword = "";
-String currentFirmwareVersion = "2.0.0";
-const unsigned long OTA_CHECK_INTERVAL = 120000; // 2 minutes
-unsigned long lastOTACheck = 0;
+String currentFirmwareVersion = "2.4.1";
 bool otaInProgress = false;
+bool otaUpdateRequested = false;
 
 // WiFi Configuration
 String wifiSSID = "";
@@ -64,6 +63,7 @@ const IPAddress AP_SUBNET(255, 255, 255, 0);
 // Hardware Pins (Production GPIO Assignment)
 const int BUTTON_PIN = 12;  // GPIO 12 (Multi-function button: mode switch + NFC activation)
 const int LED_PIN = 2;      // GPIO 2 (Built-in LED for status indication)
+const int OTA_BUTTON_PIN = 14; // GPIO 14 (OTA update trigger button)
 
 // NFC PN532 Configuration (I2C)
 const int PN532_SDA = 21;   // GPIO 21 (I2C Data)
@@ -119,6 +119,12 @@ const int FLOATING_MAX = 3800;                  // Floating range maximum
 unsigned long irGroundConnectionStart = 0;
 bool irGroundConnectionActive = false;
 bool irMotionDetected = false;
+
+// OTA Button handling variables
+bool lastOTAButtonState = HIGH;
+bool otaButtonPressed = false;
+unsigned long otaButtonPressTime = 0;
+const unsigned long OTA_BUTTON_DEBOUNCE = 50; // 50ms debounce
 
 // Motion detection schedule (every 10 minutes, check for 10 seconds after initial 10 minutes)
 const unsigned long MOTION_START_DELAY = 10 * 60 * 1000;      // 10 minutes initial delay
@@ -314,6 +320,7 @@ void setup() {
   Serial.println("📌 ESP32 DEVKIT V1 PRODUCTION PIN CONFIGURATION:");
   Serial.printf("   🎛️  Multi-Button: GPIO %d (Mode switch + NFC activation)\n", BUTTON_PIN);
   Serial.printf("   💡 Status LED: GPIO %d (Built-in LED)\n", LED_PIN);
+  Serial.printf("   🔄 OTA Button: GPIO %d (Manual OTA update trigger)\n", OTA_BUTTON_PIN);
   Serial.printf("   🌡️  DHT22 Sensor: GPIO %d (Temperature/Humidity)\n", DHT_PIN);
   Serial.printf("   👁️  IR Sensor: GPIO %d (Motion detection)\n", IR_SENSOR_PIN);
   Serial.println("   🖥️  Display Pins: RST=25, DC=26, CS=5, BUSY=27, PWR=33");
@@ -325,9 +332,11 @@ void setup() {
   Serial.println("🔌 INITIALIZING HARDWARE:");
   pinMode(BUTTON_PIN, INPUT_PULLUP);  // GPIO 12 with internal pullup
   pinMode(LED_PIN, OUTPUT);
+  pinMode(OTA_BUTTON_PIN, INPUT_PULLUP); // GPIO 14 with internal pullup for OTA
   digitalWrite(LED_PIN, LOW);
   Serial.printf("   ✅ GPIO %d (Button): INPUT_PULLUP - multi-function button\n", BUTTON_PIN);
   Serial.printf("   ✅ GPIO %d (LED): OUTPUT\n", LED_PIN);
+  Serial.printf("   ✅ GPIO %d (OTA Button): INPUT_PULLUP - OTA trigger\n", OTA_BUTTON_PIN);
   
   // Test initial button state  
   bool initialButtonState = digitalRead(BUTTON_PIN);
@@ -369,6 +378,7 @@ void setup() {
   Serial.println("📋 PRODUCTION CONTROLS:");
   Serial.printf("   - GPIO %d button: Switch Dashboard ↔ Images (SHORT PRESS < 2s)\n", BUTTON_PIN);
   Serial.printf("   - GPIO %d button: Activate NFC VCard Writing (LONG PRESS ≥ 2s)\n", BUTTON_PIN);
+  Serial.printf("   - GPIO %d button: Trigger OTA Update Check (PRESS to check for updates)\n", OTA_BUTTON_PIN);
   Serial.printf("   - GPIO %d sensor: Temperature & Humidity (DHT22)\n", DHT_PIN);
   Serial.printf("   - GPIO %d sensor: IR Motion Detection (sleep/wake)\n", IR_SENSOR_PIN);
   Serial.println("   - GPIO 21/22: NFC PN532 I2C Communication");
@@ -398,8 +408,11 @@ void loop() {
     }
     Serial.printf("   🎛️ Current mode: %s\n", currentMode ? "IMAGE" : "DASHBOARD");
     bool currentButtonState = digitalRead(BUTTON_PIN);
+    bool currentOTAButtonState = digitalRead(OTA_BUTTON_PIN);
     Serial.printf("   🎚️ Button: %s (GPIO %d)\n", 
                   currentButtonState ? "RELEASED" : "PRESSED", BUTTON_PIN);
+    Serial.printf("   🔄 OTA Button: %s (GPIO %d)\n", 
+                  currentOTAButtonState ? "RELEASED" : "PRESSED", OTA_BUTTON_PIN);
     Serial.printf("   🌡️  Temperature: %.1f°C, Humidity: %.1f%%\n", currentTemperature, currentHumidity);
     Serial.printf("   👁️  Motion sensor: %s, Sleep mode: %s\n", 
                   irMotionDetected ? "MOTION" : "CLEAR", 
@@ -462,6 +475,51 @@ void loop() {
   
   lastDebouncedState = currentButtonReading;
   
+  // Handle OTA button (GPIO 14)
+  bool currentOTAButtonReading = digitalRead(OTA_BUTTON_PIN);  // LOW = pressed, HIGH = released
+  
+  if (currentOTAButtonReading != lastOTAButtonState) {
+    otaButtonPressTime = millis();
+  }
+  
+  if ((millis() - otaButtonPressTime) > OTA_BUTTON_DEBOUNCE) {
+    if (!otaButtonPressed && currentOTAButtonReading == LOW) {
+      // OTA button just pressed
+      otaButtonPressed = true;
+      Serial.printf("🔄 OTA Button pressed (GPIO %d) - Checking for updates...\n", OTA_BUTTON_PIN);
+      
+      if (WiFi.status() == WL_CONNECTED && !otaInProgress) {
+        otaUpdateRequested = true;
+        // Visual feedback - blink LED
+        for (int i = 0; i < 3; i++) {
+          digitalWrite(LED_PIN, HIGH);
+          delay(200);
+          digitalWrite(LED_PIN, LOW);
+          delay(200);
+        }
+        checkForOTAUpdate();
+      } else if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("❌ WiFi not connected - cannot check for OTA updates");
+        // Error feedback - fast blink
+        for (int i = 0; i < 6; i++) {
+          digitalWrite(LED_PIN, HIGH);
+          delay(100);
+          digitalWrite(LED_PIN, LOW);
+          delay(100);
+        }
+      } else {
+        Serial.println("⏳ OTA update already in progress");
+      }
+      
+    } else if (otaButtonPressed && currentOTAButtonReading == HIGH) {
+      // OTA button released
+      otaButtonPressed = false;
+      Serial.printf("🔄 OTA Button released (GPIO %d)\n", OTA_BUTTON_PIN);
+    }
+  }
+  
+  lastOTAButtonState = currentOTAButtonReading;
+  
   // Handle captive portal or normal operation
   if (WiFi.status() != WL_CONNECTED && captivePortalActive) {
     // Process captive portal requests
@@ -475,12 +533,6 @@ void loop() {
     static unsigned long lastContentCheck = 0;
     static unsigned long lastSensorUpdate = 0;
     static unsigned long lastSystemCheck = 0;
-    
-    // Check for OTA updates every 2 minutes
-    if (millis() - lastOTACheck >= OTA_CHECK_INTERVAL && !otaInProgress) {
-      checkForOTAUpdate();
-      lastOTACheck = millis();
-    }
     
     // Regular content checking
     if (millis() - lastContentCheck > 30000) { // Check every 30 seconds
@@ -865,7 +917,7 @@ void handleWiFiScan() {
 }
 
 void loadConfiguration() {
-  nvs.begin("personalcms", false);
+  nvs.begin("esp32ota", false);  // Use unified namespace for cross-firmware compatibility
   
   deviceName = nvs.getString("device_name", "");
   occupation = nvs.getString("occupation", "");
@@ -889,7 +941,7 @@ void loadConfiguration() {
 }
 
 void saveConfiguration() {
-  nvs.begin("personalcms", false);
+  nvs.begin("esp32ota", false);  // Use unified namespace for cross-firmware compatibility
   
   nvs.putString("device_name", deviceName);
   nvs.putString("occupation", occupation);
@@ -1848,7 +1900,9 @@ void checkForOTAUpdate() {
     return;
   }
   
-  Serial.println("🔄 Checking for OTA updates...");
+  Serial.println("🔄 Manual OTA update check triggered...");
+  Serial.printf("   Current version: %s\n", currentFirmwareVersion.c_str());
+  Serial.printf("   Server URL: %s\n", serverURL.c_str());
   
   HTTPClient http;
   http.begin(serverURL + "/api/ota/check/" + deviceID);

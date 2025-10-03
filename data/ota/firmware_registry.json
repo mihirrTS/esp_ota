@@ -1,31 +1,43 @@
 {
   "firmware_versions": {
-    "ESP32_OTA_Base_2.0": {
-      "version": "2.0",
+    "ESP32_OTA_Base_20251003.133806": {
+      "version": "20251003.133806",
       "device_type": "ESP32_OTA_Base",
-      "filename": "ESP32_OTA_Base_2.0_20251001_222859.bin",
-      "filepath": "data/ota\\firmware\\ESP32_OTA_Base_2.0_20251001_222859.bin",
+      "filename": "ESP32_OTA_Base_20251003.133806.bin",
+      "filepath": "data/ota\\firmware\\ESP32_OTA_Base_20251003.133806.bin",
       "description": "Test upload",
-      "upload_date": "2025-10-01T22:28:59.862038",
-      "file_size": 1133072,
-      "file_hash": "ae672f17612e97121cebab7db9685385a043b70576615906044ffd698f97adb5",
-      "download_count": 0,
+      "upload_date": "2025-10-03T13:38:06.907330",
+      "file_size": 1133664,
+      "file_hash": "8786e506ec23777c78bee8fbcb8044229755565d02e48ae3cf666327e93bf492",
+      "download_count": 1,
+      "is_active": true
+    },
+    "ESP32_PersonalCMS_20251003.134016": {
+      "version": "20251003.134016",
+      "device_type": "ESP32_PersonalCMS",
+      "filename": "ESP32_PersonalCMS_20251003.134016.bin",
+      "filepath": "data/ota\\firmware\\ESP32_PersonalCMS_20251003.134016.bin",
+      "description": "Test upload",
+      "upload_date": "2025-10-03T13:40:16.688127",
+      "file_size": 1201664,
+      "file_hash": "10f36fc73aec8bc9e377619df117e7316d086e95f269bbf4c4ad50e1bb4aa9a0",
+      "download_count": 1,
       "is_active": true
     }
   },
   "device_assignments": {
     "ESP32_PersonalCMS": {
-      "latest": "2.0"
+      "latest": "20251003.134016"
     },
     "ESP32_LED_Blink": {
-      "latest": "2.0"
+      "latest": "20251003.130522"
     },
     "ESP32_OTA_BASE_001": "compiled_ESP32_DevKit_V1_OTA_Base",
     "ESP32_OTA_LED_001": "compiled_ESP32_DevKit_V1_LED_Blink",
     "ESP32_DevKit_V1_Device1": "compiled_ESP32_DevKit_V1_OTA_Base",
     "ESP32_DevKit_V1_Device2": "compiled_ESP32_DevKit_V1_LED_Blink",
     "ESP32_OTA_Base": {
-      "latest": "2.0"
+      "latest": "20251003.133806"
     }
   },
   "auto_update_enabled": true
